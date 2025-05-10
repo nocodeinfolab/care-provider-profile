@@ -1176,15 +1176,6 @@
                 return;
             }
             
-            // Set timeout for API request
-            const apiTimeout = setTimeout(() => {
-                showError("Server is taking too long to respond. Please try again later.");
-                console.error("API request timed out");
-            }, 10000); // 10 second timeout
-            
-            // Fetch provider data
-            fetchProviderData(providerEmail)
-                .finally(() => clearTimeout(apiTimeout));
             
             // Setup all interactive functionality
             setupEditButtons();
