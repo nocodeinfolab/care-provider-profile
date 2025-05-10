@@ -567,80 +567,93 @@
             document.getElementById('errorMessage').style.display = 'none';
 
             try {
-                console.log('Making API request...');
-                const apiUrl = `https://firebase-backend-6arf.onrender.com/care_providers?email=${encodeURIComponent(email)}`;
-                console.log('API URL:', apiUrl);
-                
-                const response = await fetch(apiUrl, {
-                    headers: {
-                        'Accept': 'application/json'
+                const response = await fetch(
+                    `https://firebase-backend-6arf.onrender.com/care_providers?email=${encodeURIComponent(email)}`, 
+                    {
+                        headers: {
+                            'Accept': 'application/json'
+                        }
                     }
-                });
-                
-                console.log('Response status:', response.status);
+                );
                 
                 if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('API Error Response:', errorText);
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
                 const providerData = await response.json();
-                console.log('Received provider data:', providerData);
-
+                
                 if (!providerData) {
                     throw new Error('No data received from server');
                 }
 
-                // Handle both array and single object responses
-                let dataToDisplay;
-                if (Array.isArray(providerData)) {
-                    if (providerData.length === 0) {
-                        throw new Error('No providers found');
-                    }
-                    // Find exact match by email or use first item
-                    dataToDisplay = providerData.find(p => p.email === email) || providerData[0];
-                } else {
-                    dataToDisplay = providerData;
-                }
+                // Store the provider ID for later updates
+                providerData.id = providerData.id || providerData.uid;
+                window.currentProviderId = providerData.id;
 
-                if (!dataToDisplay.email) {
-                    throw new Error('Invalid provider data received');
-                }
-
-                displayProviderData(dataToDisplay);
+                displayProviderData(providerData);
             } catch (error) {
                 console.error('Error in fetchProviderData:', error);
                 showError(`Failed to load profile: ${error.message}`);
-                
-                // For debugging - show sample data
-                console.log('Showing sample data for debugging');
-                displayProviderData({
-                    full_name: "Dr. Sample Provider",
-                    email: email,
-                    role: "Psychologist",
-                    status: "active",
-                    profile_picture_url: "",
-                    gender: "Male",
-                    years_experience: 5,
-                    license_number: "SAMPLE123",
-                    specializations: ["Anxiety", "Depression"],
-                    phone: "+1234567890",
-                    location: {
-                        city: "Sample City",
-                        state: "Sample State",
-                        country: "Sample Country"
-                    },
-                    languages: ["English"],
-                    availability: [{
-                        day: "Monday",
-                        time_slots: [{start: "9:00 AM", end: "5:00 PM"}]
-                    }],
-                    bio: "Sample bio text for debugging purposes"
-                });
             }
         }
 
+        async function saveChanges() {
+            // Get all edited values
+            const updatedProvider = {
+                full_name: getFullNameEdit(),
+                gender: getGenderEdit(),
+                role: getRoleEdit(),
+                specializations: getSpecializationsEdit(),
+                years_experience: parseInt(document.getElementById('experienceEdit').value) || 0,
+                phone: document.getElementById('phoneEdit').value,
+                location: {
+                    city: document.getElementById('cityEdit').value,
+                    state: document.getElementById('stateEdit').value,
+                    country: document.getElementById('countryEdit').value
+                },
+                languages: getLanguagesEdit(),
+                availability: getAvailabilityEdit(),
+                bio: document.getElementById('bioEdit').value
+            };
+            
+            // Show loading
+            document.getElementById('loading').style.display = 'flex';
+            
+            try {
+                const response = await fetch(
+                    `https://firebase-backend-6arf.onrender.com/care_providers/${window.currentProviderId}`, 
+                    {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(updatedProvider)
+                    }
+                );
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Update failed');
+                }
+                
+                const data = await response.json();
+                
+                // Refresh the displayed data
+                displayProviderData(data);
+                
+                // Exit edit mode
+                cancelEditing();
+                
+                // Show success message
+                alert('Profile updated successfully!');
+                
+            } catch (error) {
+                console.error('Error updating provider data:', error);
+                alert('Error updating profile: ' + error.message);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
 
         function displayProviderData(provider) {
             try {
@@ -783,7 +796,41 @@
                 document.querySelector('.profile-card:nth-child(7)').classList.add('editing');
                 toggleSaveCancelButtons(true);
             });
+
+            document.getElementById('editBioBtn').addEventListener('click', function() {
+                const bioCard = document.querySelector('.profile-card:last-child');
+                
+                if (!bioCard) {
+                    console.error('Bio card not found');
+                    return;
+                }
+                
+                bioCard.classList.add('editing');
+                toggleSaveCancelButtons(true);
+                
+                // Ensure textarea has current bio
+                document.getElementById('bioEdit').value = document.getElementById('bioValue').textContent.trim();
+            });
         }
+
+        function validateUpdateData(data) {
+            if (!data.full_name) {
+                throw new Error('Full name is required');
+            }
+            
+            if (!data.role) {
+                throw new Error('Professional role is required');
+            }
+            
+            if (!data.phone || !/^\d{10,15}$/.test(data.phone)) {
+                throw new Error('Valid phone number is required');
+            }
+            
+            if (!data.years_experience || isNaN(data.years_experience)) {
+                throw new Error('Valid years of experience is required');
+            }
+        }
+        
 
         function toggleSaveCancelButtons(show) {
             document.getElementById('saveBtn').style.display = show ? 'inline-block' : 'none';
