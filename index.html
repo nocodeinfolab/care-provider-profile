@@ -564,80 +564,23 @@
             // Show loading state
             document.getElementById('loading').style.display = 'flex';
             document.getElementById('profileContent').style.display = 'none';
-            document.getElementById('errorMessage').style.display = 'none';
 
             try {
-                console.log('Making API request...');
                 const apiUrl = `https://firebase-backend-6arf.onrender.com/filter_care_providers?email=${encodeURIComponent(email)}`;
-                console.log('API URL:', apiUrl);
-                
-                const response = await fetch(apiUrl, {
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                });
-                
-                console.log('Response status:', response.status);
+                const response = await fetch(apiUrl);
                 
                 if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('API Error Response:', errorText);
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error('Failed to fetch provider');
                 }
 
                 const providerData = await response.json();
-                console.log('Received provider data:', providerData);
-
-                if (!providerData) {
-                    throw new Error('No data received from server');
-                }
-
-                // Handle both array and single object responses
-                let dataToDisplay;
-                if (Array.isArray(providerData)) {
-                    if (providerData.length === 0) {
-                        throw new Error('No providers found');
-                    }
-                    // Find exact match by email or use first item
-                    dataToDisplay = providerData.find(p => p.email === email) || providerData[0];
-                } else {
-                    dataToDisplay = providerData;
-                }
-
-                if (!dataToDisplay.email) {
-                    throw new Error('Invalid provider data received');
-                }
-
-                displayProviderData(dataToDisplay);
-            } catch (error) {
-                console.error('Error in fetchProviderData:', error);
-                showError(`Failed to load profile: ${error.message}`);
+                displayProviderData(providerData);
                 
-                // For debugging - show sample data
-                console.log('Showing sample data for debugging');
-                displayProviderData({
-                    full_name: "Dr. Sample Provider",
-                    email: email,
-                    role: "Psychologist",
-                    status: "active",
-                    profile_picture_url: "",
-                    gender: "Male",
-                    years_experience: 5,
-                    license_number: "SAMPLE123",
-                    specializations: ["Anxiety", "Depression"],
-                    phone: "+1234567890",
-                    location: {
-                        city: "Sample City",
-                        state: "Sample State",
-                        country: "Sample Country"
-                    },
-                    languages: ["English"],
-                    availability: [{
-                        day: "Monday",
-                        time_slots: [{start: "9:00 AM", end: "5:00 PM"}]
-                    }],
-                    bio: "Sample bio text for debugging purposes"
-                });
+            } catch (error) {
+                console.error('Error:', error);
+                showError(error.message);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
             }
         }
 
