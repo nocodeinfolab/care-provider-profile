@@ -558,6 +558,26 @@
         // Core Data Functions
         // =============================================
 
+        // Loading state management
+        function showLoadingState() {
+            console.log('Showing loading state');
+            document.getElementById('loading').style.display = 'flex';
+            document.getElementById('profileContent').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        function hideLoadingState() {
+            console.log('Hiding loading state');
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function showError(message) {
+            console.error('Showing error:', message);
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorMessage').style.display = 'block';
+            hideLoadingState();
+        }
+
         async function fetchProviderData(email) {
             console.group('Fetching Provider Data');
             console.log('Initiated at:', new Date().toISOString());
