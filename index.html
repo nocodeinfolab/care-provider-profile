@@ -559,31 +559,48 @@
         // =============================================
 
         async function fetchProviderData(email) {
-            console.log(`Fetching data for email: ${email}`);
+            console.group('Fetching Provider Data');
+            console.log('Initiated at:', new Date().toISOString());
             
-            // Show loading state
-            document.getElementById('loading').style.display = 'flex';
-            document.getElementById('profileContent').style.display = 'none';
-
+            showLoadingState();
+            let response;
+            
             try {
                 const apiUrl = `https://firebase-backend-6arf.onrender.com/filter_care_providers?email=${encodeURIComponent(email)}`;
-                const response = await fetch(apiUrl);
+                console.log('Making request to:', apiUrl);
+                
+                response = await fetch(apiUrl);
+                console.log('Response status:', response.status);
                 
                 if (!response.ok) {
-                    throw new Error('Failed to fetch provider');
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
                 }
 
                 const providerData = await response.json();
+                console.log('Received data:', providerData);
+                
+                if (!providerData?.email) {
+                    throw new Error('Invalid data structure received');
+                }
+                
                 displayProviderData(providerData);
                 
             } catch (error) {
-                console.error('Error:', error);
-                showError(error.message);
+                console.error('Full error details:', {
+                    error: error.toString(),
+                    stack: error.stack,
+                    response: response ? await response.clone().text() : 'No response'
+                });
+                
+                showError(`Failed to load profile: ${error.message}`);
+                
             } finally {
-                document.getElementById('loading').style.display = 'none';
+                console.log('Finished at:', new Date().toISOString());
+                console.groupEnd();
+                hideLoadingState();
             }
         }
-
 
         function displayProviderData(provider) {
             try {
@@ -1119,6 +1136,15 @@
                 return;
             }
             
+            // Set timeout for API request
+            const apiTimeout = setTimeout(() => {
+                showError("Server is taking too long to respond. Please try again later.");
+                console.error("API request timed out");
+            }, 10000); // 10 second timeout
+            
+            // Fetch provider data
+            fetchProviderData(providerEmail)
+                .finally(() => clearTimeout(apiTimeout));
             
             // Setup all interactive functionality
             setupEditButtons();
