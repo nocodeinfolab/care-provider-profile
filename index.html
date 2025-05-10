@@ -567,33 +567,80 @@
             document.getElementById('errorMessage').style.display = 'none';
 
             try {
-                const response = await fetch(`https://firebase-backend-6arf.onrender.com/care_providers?email=${encodeURIComponent(email)}`);
+                console.log('Making API request...');
+                const apiUrl = `https://firebase-backend-6arf.onrender.com/care_providers?email=${encodeURIComponent(email)}`;
+                console.log('API URL:', apiUrl);
+                
+                const response = await fetch(apiUrl, {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                console.log('Response status:', response.status);
                 
                 if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('API Error Response:', errorText);
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
                 const providerData = await response.json();
                 console.log('Received provider data:', providerData);
 
-                if (!providerData || providerData.error) {
-                    throw new Error(providerData?.error || 'No provider data received');
+                if (!providerData) {
+                    throw new Error('No data received from server');
                 }
 
+                // Handle both array and single object responses
+                let dataToDisplay;
                 if (Array.isArray(providerData)) {
-                    if (providerData.length > 0) {
-                        displayProviderData(providerData.find(p => p.email === email) || providerData[0]);
-                    } else {
+                    if (providerData.length === 0) {
                         throw new Error('No providers found');
                     }
+                    // Find exact match by email or use first item
+                    dataToDisplay = providerData.find(p => p.email === email) || providerData[0];
                 } else {
-                    displayProviderData(providerData);
+                    dataToDisplay = providerData;
                 }
+
+                if (!dataToDisplay.email) {
+                    throw new Error('Invalid provider data received');
+                }
+
+                displayProviderData(dataToDisplay);
             } catch (error) {
-                console.error('Error fetching provider data:', error);
+                console.error('Error in fetchProviderData:', error);
                 showError(`Failed to load profile: ${error.message}`);
+                
+                // For debugging - show sample data
+                console.log('Showing sample data for debugging');
+                displayProviderData({
+                    full_name: "Dr. Sample Provider",
+                    email: email,
+                    role: "Psychologist",
+                    status: "active",
+                    profile_picture_url: "",
+                    gender: "Male",
+                    years_experience: 5,
+                    license_number: "SAMPLE123",
+                    specializations: ["Anxiety", "Depression"],
+                    phone: "+1234567890",
+                    location: {
+                        city: "Sample City",
+                        state: "Sample State",
+                        country: "Sample Country"
+                    },
+                    languages: ["English"],
+                    availability: [{
+                        day: "Monday",
+                        time_slots: [{start: "9:00 AM", end: "5:00 PM"}]
+                    }],
+                    bio: "Sample bio text for debugging purposes"
+                });
             }
         }
+
 
         function displayProviderData(provider) {
             try {
@@ -1125,12 +1172,19 @@
             const providerEmail = urlParams.get('email');
             
             if (!providerEmail) {
-                showError("No email parameter provided in URL");
+                showError("No email parameter provided in URL. Please access with ?email=your@email.com");
                 return;
             }
             
+            // Set timeout for API request
+            const apiTimeout = setTimeout(() => {
+                showError("Server is taking too long to respond. Please try again later.");
+                console.error("API request timed out");
+            }, 10000); // 10 second timeout
+            
             // Fetch provider data
-            fetchProviderData(providerEmail);
+            fetchProviderData(providerEmail)
+                .finally(() => clearTimeout(apiTimeout));
             
             // Setup all interactive functionality
             setupEditButtons();
