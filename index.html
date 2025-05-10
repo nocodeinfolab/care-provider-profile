@@ -949,7 +949,7 @@
             document.getElementById('loading').style.display = 'flex';
             
             try {
-                const response = await fetch(`https://firebase-backend-6arf.onrender.com/care_providers?email=${encodeURIComponent(providerEmail)}`, {
+                const response = await fetch(`https://firebase-backend-6arf.onrender.com/filter_care_providers?email=${encodeURIComponent(providerEmail)}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
