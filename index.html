@@ -554,92 +554,10 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get email from URL parameter
-            const urlParams = new URLSearchParams(window.location.search);
-            const providerEmail = urlParams.get('email');
-            
-            if (!providerEmail) {
-                showError("No email parameter provided in URL");
-                return;
-            }
-            
-            // Fetch provider data
-            fetchProviderData(providerEmail);
-            
-            // Setup edit functionality
-            setupEditButtons();
-            setupOtherInputFields();
-            setupSpecializationOther();
-            setupLanguageFields();
-            setupDayAvailability();
-            setupSaveCancelButtons();
-        });
-        
-        function fetchProviderData(email) {
-            console.log(`Fetching data for email: ${email}`);
-            
-            // Show loading state
-            document.getElementById('loading').style.display = 'flex';
-            document.getElementById('profileContent').style.display = 'none';
-            document.getElementById('errorMessage').style.display = 'none';
+                // =============================================
+        // Core Data Functions
+        // =============================================
 
-            fetch(`https://firebase-backend-6arf.onrender.com/care_providers?email=${encodeURIComponent(email)}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Received data:', data);
-                    if (data && !data.error) {
-                        displayProviderData(data);
-                    } else {
-                        throw new Error(data?.error || 'No provider data received');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching provider data:', error);
-                    showError(`Failed to load profile: ${error.message}`);
-                });
-        }
-
-        // Update the displayProviderData function
-                // Replace the fetchProviderData function
-        function fetchProviderData(email) {
-            console.log(`Fetching data for email: ${email}`);
-            
-            // Show loading state
-            document.getElementById('loading').style.display = 'flex';
-            document.getElementById('profileContent').style.display = 'none';
-            document.getElementById('errorMessage').style.display = 'none';
-
-            fetch(`https://firebase-backend-6arf.onrender.com/care_providers?email=${encodeURIComponent(email)}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(providerData => {
-                    console.log('Received provider data:', providerData);
-                    if (providerData && !providerData.error) {
-                        displayProviderData(providerData);
-                    } else {
-                        throw new Error(providerData?.error || 'No provider data received');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching provider data:', error);
-                    showError(`Failed to load profile: ${error.message}`);
-                    
-                    // For debugging - show the error in console
-                    console.log('Full error details:', error);
-                });
-        }
-
-        // Update the displayProviderData function
         async function fetchProviderData(email) {
             console.log(`Fetching data for email: ${email}`);
             
@@ -662,9 +580,7 @@
                     throw new Error(providerData?.error || 'No provider data received');
                 }
 
-                // Ensure we're working with a single provider object
                 if (Array.isArray(providerData)) {
-                    // If backend accidentally returns array, use first match
                     if (providerData.length > 0) {
                         displayProviderData(providerData.find(p => p.email === email) || providerData[0]);
                     } else {
@@ -679,7 +595,6 @@
             }
         }
 
-        // Update the displayProviderData function
         function displayProviderData(provider) {
             try {
                 console.log('Displaying provider:', provider);
@@ -688,11 +603,10 @@
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('profileContent').style.display = 'block';
 
-                // Set profile picture - handle both URL formats
+                // Set profile picture
                 const profileImage = document.getElementById('profileImage');
                 if (provider.profile_picture_url || provider.profilePicture) {
                     profileImage.src = provider.profile_picture_url || provider.profilePicture;
-                    console.log('Profile image URL:', profileImage.src);
                 } else {
                     // Fallback SVG
                     profileImage.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 24 24" fill="%2387CEEB"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>';
@@ -786,95 +700,58 @@
                 showError('Error displaying profile information');
             }
         }
-        function setupOtherInputFields() {
-            // Title "Other" field
-            document.getElementById('titleEdit').addEventListener('change', function() {
-                document.getElementById('otherTitleEdit').style.display = 
-                    this.value === 'Other' ? 'block' : 'none';
-                if (this.value !== 'Other') document.getElementById('otherTitleEdit').value = '';
+
+        // =============================================
+        // Edit Functionality
+        // =============================================
+
+        function setupEditButtons() {
+            document.getElementById('editPersonalBtn').addEventListener('click', function() {
+                document.querySelector('.profile-card:nth-child(2)').classList.add('editing');
+                toggleSaveCancelButtons(true);
             });
             
-            // Gender "Other" field
-            document.getElementById('genderEdit').addEventListener('change', function() {
-                document.getElementById('otherGenderEdit').style.display = 
-                    this.value === 'Other' ? 'block' : 'none';
-                if (this.value !== 'Other') document.getElementById('otherGenderEdit').value = '';
+            document.getElementById('editProfessionalBtn').addEventListener('click', function() {
+                document.querySelector('.profile-card:nth-child(3)').classList.add('editing');
+                toggleSaveCancelButtons(true);
             });
             
-            // Role "Other" field
-            document.getElementById('roleEdit').addEventListener('change', function() {
-                document.getElementById('otherRoleEdit').style.display = 
-                    this.value === 'Other' ? 'block' : 'none';
-                if (this.value !== 'Other') document.getElementById('otherRoleEdit').value = '';
-            });
-        }
-        
-        function setupSpecializationOther() {
-            document.querySelector('input[name="specialization"][value="Other"]')
-                .addEventListener('change', function() {
-                    document.getElementById('otherSpecializationEdit').style.display = 
-                        this.checked ? 'block' : 'none';
-                    if (!this.checked) document.getElementById('otherSpecializationEdit').value = '';
-                });
-        }
-        
-        function setupLanguageFields() {
-            document.getElementById('addLanguageBtn').addEventListener('click', function() {
-                addLanguageInput('');
+            document.getElementById('editContactBtn').addEventListener('click', function() {
+                document.querySelector('.profile-card:nth-child(4)').classList.add('editing');
+                toggleSaveCancelButtons(true);
             });
             
-            // Event delegation for remove buttons
-            document.getElementById('languageInputs').addEventListener('click', function(e) {
-                if (e.target.classList.contains('remove-language-btn') || 
-                    e.target.closest('.remove-language-btn')) {
-                    const group = e.target.closest('.language-input-group');
-                    if (group && document.querySelectorAll('.language-input-group').length > 1) {
-                        group.remove();
-                    }
-                }
+            document.getElementById('editLanguagesBtn').addEventListener('click', function() {
+                document.querySelector('.profile-card:nth-child(5)').classList.add('editing');
+                toggleSaveCancelButtons(true);
+            });
+            
+            document.getElementById('editAvailabilityBtn').addEventListener('click', function() {
+                document.querySelector('.profile-card:nth-child(6)').classList.add('editing');
+                toggleSaveCancelButtons(true);
+                setupDayAvailabilityEditMode();
+            });
+            
+            document.getElementById('editBioBtn').addEventListener('click', function() {
+                document.querySelector('.profile-card:nth-child(7)').classList.add('editing');
+                toggleSaveCancelButtons(true);
             });
         }
-        
-        function addLanguageInput(value = '') {
-            const group = document.createElement('div');
-            group.className = 'language-input-group';
-            group.style.marginBottom = '10px';
-            group.innerHTML = `
-                <input type="text" class="language-input" placeholder="e.g., English" value="${value}" style="width: calc(100% - 30px);">
-                <button type="button" class="remove-language-btn" style="background: none; border: none; color: #ff6b6b; cursor: pointer;">
-                    <i class="fas fa-times"></i>
-                </button>
-            `;
-            document.getElementById('languageInputs').appendChild(group);
+
+        function toggleSaveCancelButtons(show) {
+            document.getElementById('saveBtn').style.display = show ? 'inline-block' : 'none';
+            document.getElementById('cancelBtn').style.display = show ? 'inline-block' : 'none';
         }
-        
-        function setupDayAvailability() {
-            // Handle day checkbox changes in edit mode
-            document.querySelectorAll('input[name="available-day"]').forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
-                    if (this.checked) {
-                        addDayAvailabilityEdit(this.value);
-                    } else {
-                        removeDayAvailabilityEdit(this.value);
-                    }
-                });
-            });
-        }
-        
+
         function setupDayAvailabilityEditMode() {
-            // Clear existing edit sections
             document.getElementById('availabilityDaysEdit').innerHTML = '';
-            
-            // Add sections for checked days
             document.querySelectorAll('input[name="available-day"]:checked').forEach(checkbox => {
                 addDayAvailabilityEdit(checkbox.value);
             });
         }
-        
+
         function addDayAvailabilityEdit(day) {
             const container = document.getElementById('availabilityDaysEdit');
-            
-            // Check if this day already exists
             if (document.getElementById(`day-edit-${day}`)) return;
             
             const dayElement = document.createElement('div');
@@ -904,29 +781,20 @@
                         </select>
                         <span>to</span>
                         <input type="text" class="end-time" readonly>
-                        <button type="button" class="remove-time-slot-btn" style="background: none; border: none; color: #ff6b6b; cursor: pointer;">
+                        <button type="button" class="remove-time-slot-btn">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
                 </div>
-                <button type="button" class="add-time-slot-btn" data-day="${day}" style="background: none; border: none; color: var(--sky-blue); cursor: pointer; margin-top: 5px;">
+                <button type="button" class="add-time-slot-btn" data-day="${day}">
                     <i class="fas fa-plus"></i> Add Time Slot
                 </button>
             `;
             
             container.appendChild(dayElement);
-            
-            // Set up time slot interactions
             setupTimeSlotInteractions(day);
         }
-        
-        function removeDayAvailabilityEdit(day) {
-            const element = document.getElementById(`day-edit-${day}`);
-            if (element) {
-                element.remove();
-            }
-        }
-        
+
         function setupTimeSlotInteractions(day) {
             const container = document.getElementById(`time-slots-edit-${day}`);
             
@@ -958,7 +826,7 @@
                 }
             });
         }
-        
+
         function addTimeSlotEdit(day) {
             const container = document.getElementById(`time-slots-edit-${day}`);
             const newSlot = document.createElement('div');
@@ -982,13 +850,13 @@
                 </select>
                 <span>to</span>
                 <input type="text" class="end-time" readonly>
-                <button type="button" class="remove-time-slot-btn" style="background: none; border: none; color: #ff6b6b; cursor: pointer;">
+                <button type="button" class="remove-time-slot-btn">
                     <i class="fas fa-times"></i>
                 </button>
             `;
             container.appendChild(newSlot);
         }
-        
+
         function calculateEndTime(startTime) {
             const [time, period] = startTime.split(' ');
             let [hours, minutes] = time.split(':').map(Number);
@@ -1009,13 +877,25 @@
             
             return `${hours}:${minutes} ${newPeriod}`;
         }
-        
+
         function setupSaveCancelButtons() {
             document.getElementById('saveBtn').addEventListener('click', saveChanges);
             document.getElementById('cancelBtn').addEventListener('click', cancelEditing);
         }
-        
-        function saveChanges() {
+
+        function cancelEditing() {
+            document.querySelectorAll('.profile-card').forEach(card => {
+                card.classList.remove('editing');
+            });
+            toggleSaveCancelButtons(false);
+            
+            // Reload original data
+            const urlParams = new URLSearchParams(window.location.search);
+            const providerEmail = urlParams.get('email');
+            fetchProviderData(providerEmail);
+        }
+
+        async function saveChanges() {
             // Get all edited values
             const updatedProvider = {
                 full_name: getFullNameEdit(),
@@ -1041,21 +921,20 @@
             // Show loading
             document.getElementById('loading').style.display = 'flex';
             
-            // Send update to server
-            fetch(`https://firebase-backend-6arf.onrender.com/care_providers?email=${encodeURIComponent(providerEmail)}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(updatedProvider)
-            })
-            .then(response => {
+            try {
+                const response = await fetch(`https://firebase-backend-6arf.onrender.com/care_providers?email=${encodeURIComponent(providerEmail)}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updatedProvider)
+                });
+                
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
-                return response.json();
-            })
-            .then(data => {
+                
+                const data = await response.json();
                 if (data && !data.error) {
                     // Refresh the displayed data
                     displayProviderData(data);
@@ -1066,16 +945,15 @@
                 } else {
                     throw new Error(data.error || 'Update failed');
                 }
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error('Error updating provider data:', error);
                 alert('Error updating profile: ' + error.message);
-            })
-            .finally(() => {
+            } finally {
                 document.getElementById('loading').style.display = 'none';
-            });
+            }
         }
-        
+
+        // Helper functions for saveChanges()
         function getFullNameEdit() {
             const title = document.getElementById('titleEdit').value === 'Other' ? 
                 document.getElementById('otherTitleEdit').value : document.getElementById('titleEdit').value;
@@ -1083,17 +961,17 @@
             const lastName = document.getElementById('lastNameEdit').value;
             return `${title} ${firstName} ${lastName}`.trim();
         }
-        
+
         function getGenderEdit() {
             return document.getElementById('genderEdit').value === 'Other' ? 
                 document.getElementById('otherGenderEdit').value : document.getElementById('genderEdit').value;
         }
-        
+
         function getRoleEdit() {
             return document.getElementById('roleEdit').value === 'Other' ? 
                 document.getElementById('otherRoleEdit').value : document.getElementById('roleEdit').value;
         }
-        
+
         function getSpecializationsEdit() {
             const specializations = Array.from(document.querySelectorAll('input[name="specialization"]:checked'))
                 .map(el => el.value === 'Other' ? 
@@ -1101,13 +979,13 @@
             
             return specializations.filter(spec => spec !== '');
         }
-        
+
         function getLanguagesEdit() {
             return Array.from(document.querySelectorAll('.language-input'))
                 .map(input => input.value.trim())
                 .filter(lang => lang !== '');
         }
-        
+
         function getAvailabilityEdit() {
             const availability = [];
             
@@ -1141,22 +1019,127 @@
             
             return availability;
         }
-        
-        function cancelEditing() {
-            // Exit edit mode for all sections
-            document.querySelectorAll('.profile-card').forEach(card => {
-                card.classList.remove('editing');
+
+        // =============================================
+        // Form Field Setup Functions
+        // =============================================
+
+        function setupOtherInputFields() {
+            // Title "Other" field
+            document.getElementById('titleEdit').addEventListener('change', function() {
+                document.getElementById('otherTitleEdit').style.display = 
+                    this.value === 'Other' ? 'block' : 'none';
+                if (this.value !== 'Other') document.getElementById('otherTitleEdit').value = '';
             });
             
-            // Hide save/cancel buttons
-            document.getElementById('saveBtn').style.display = 'none';
-            document.getElementById('cancelBtn').style.display = 'none';
+            // Gender "Other" field
+            document.getElementById('genderEdit').addEventListener('change', function() {
+                document.getElementById('otherGenderEdit').style.display = 
+                    this.value === 'Other' ? 'block' : 'none';
+                if (this.value !== 'Other') document.getElementById('otherGenderEdit').value = '';
+            });
             
-            // Reload original data (in case any changes were made but not saved)
+            // Role "Other" field
+            document.getElementById('roleEdit').addEventListener('change', function() {
+                document.getElementById('otherRoleEdit').style.display = 
+                    this.value === 'Other' ? 'block' : 'none';
+                if (this.value !== 'Other') document.getElementById('otherRoleEdit').value = '';
+            });
+        }
+
+        function setupSpecializationOther() {
+            document.querySelector('input[name="specialization"][value="Other"]')
+                .addEventListener('change', function() {
+                    document.getElementById('otherSpecializationEdit').style.display = 
+                        this.checked ? 'block' : 'none';
+                    if (!this.checked) document.getElementById('otherSpecializationEdit').value = '';
+                });
+        }
+
+        function setupLanguageFields() {
+            document.getElementById('addLanguageBtn').addEventListener('click', function() {
+                addLanguageInput('');
+            });
+            
+            // Event delegation for remove buttons
+            document.getElementById('languageInputs').addEventListener('click', function(e) {
+                if (e.target.classList.contains('remove-language-btn') || 
+                    e.target.closest('.remove-language-btn')) {
+                    const group = e.target.closest('.language-input-group');
+                    if (group && document.querySelectorAll('.language-input-group').length > 1) {
+                        group.remove();
+                    }
+                }
+            });
+        }
+
+        function addLanguageInput(value = '') {
+            const group = document.createElement('div');
+            group.className = 'language-input-group';
+            group.style.marginBottom = '10px';
+            group.innerHTML = `
+                <input type="text" class="language-input" placeholder="e.g., English" value="${value}" style="width: calc(100% - 30px);">
+                <button type="button" class="remove-language-btn" style="background: none; border: none; color: #ff6b6b; cursor: pointer;">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            document.getElementById('languageInputs').appendChild(group);
+        }
+
+        function setupDayAvailability() {
+            document.querySelectorAll('input[name="available-day"]').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        addDayAvailabilityEdit(this.value);
+                    } else {
+                        removeDayAvailabilityEdit(this.value);
+                    }
+                });
+            });
+        }
+
+        function removeDayAvailabilityEdit(day) {
+            const element = document.getElementById(`day-edit-${day}`);
+            if (element) {
+                element.remove();
+            }
+        }
+
+        // =============================================
+        // Utility Functions
+        // =============================================
+
+        function showError(message) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorMessage').style.display = 'block';
+        }
+
+        // =============================================
+        // Initialize the Page
+        // =============================================
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get email from URL parameter
             const urlParams = new URLSearchParams(window.location.search);
             const providerEmail = urlParams.get('email');
+            
+            if (!providerEmail) {
+                showError("No email parameter provided in URL");
+                return;
+            }
+            
+            // Fetch provider data
             fetchProviderData(providerEmail);
-        }
+            
+            // Setup all interactive functionality
+            setupEditButtons();
+            setupOtherInputFields();
+            setupSpecializationOther();
+            setupLanguageFields();
+            setupDayAvailability();
+            setupSaveCancelButtons();
+        });
     </script>
 </body>
 </html>
