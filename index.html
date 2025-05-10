@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Provider Profile | PsyClinic</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --sky-blue: #87CEEB;
+            --deep-blue: #1E90FF;
+            --light-blue: #E6F4F9;
+            --dark-blue: #005B96;
+            --white: #FFFFFF;
+            --light-gray: #F5F5F5;
+            --medium-gray: #666666;
+            --dark-gray: #333333;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: var(--light-blue);
+            color: var(--dark-gray);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 15px;
+        }
+        
+        .profile-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: var(--white);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .profile-picture {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--sky-blue);
+            margin-bottom: 15px;
+        }
+        
+        .profile-name {
+            font-family: 'Playfair Display', serif;
+            color: var(--dark-blue);
+            font-size: 1.8rem;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        
+        .profile-role {
+            color: var(--medium-gray);
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+        
+        .profile-status {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: var(--sky-blue);
+            color: var(--dark-blue);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .profile-card {
+            background-color: var(--white);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            color: var(--dark-blue);
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .edit-btn {
+            background: none;
+            border: none;
+            color: var(--sky-blue);
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .edit-btn i {
+            font-size: 0.9rem;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        
+        .info-item {
+            margin-bottom: 10px;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: var(--medium-gray);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-size: 1rem;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--light-gray);
+        }
+        
+        .editable {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+            display: none;
+        }
+        
+        .editable:focus {
+            border-color: var(--sky-blue);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(135, 206, 235, 0.3);
+        }
+        
+        .editing .info-value {
+            display: none;
+        }
+        
+        .editing .editable {
+            display: block;
+        }
+        
+        .specializations {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .specialization-tag {
+            background-color: var(--light-blue);
+            color: var(--dark-blue);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+        
+        .language-tag {
+            background-color: var(--light-blue);
+            color: var(--dark-blue);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+        
+        .availability-day {
+            background-color: var(--light-blue);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .day-title {
+            font-weight: 600;
+            color: var(--dark-blue);
+            margin-bottom: 8px;
+        }
+        
+        .time-slot {
+            display: inline-block;
+            background-color: var(--white);
+            padding: 5px 10px;
+            border-radius: 15px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+        }
+        
+        .btn-save {
+            background-color: var(--sky-blue);
+            color: var(--dark-blue);
+            display: none;
+        }
+        
+        .btn-cancel {
+            background-color: var(--light-gray);
+            color: var(--medium-gray);
+            display: none;
+        }
+        
+        .editing .btn-save,
+        .editing .btn-cancel {
+            display: block;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--deep-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            color: #ff6b6b;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        /* Responsive */
+        @media (min-width: 768px) {
+            .container {
+                max-width: 800px;
+                padding: 20px;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .profile-header {
+                flex-direction: row;
+                text-align: left;
+                align-items: flex-start;
+                padding: 30px;
+            }
+            
+            .profile-picture {
+                margin-right: 25px;
+                margin-bottom: 0;
+                width: 150px;
+                height: 150px;
+            }
+            
+            .profile-name {
+                text-align: left;
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+        </div>
+        
+        <div id="profileContent" style="display: none;">
+            <div class="profile-header">
+                <img id="profileImage" class="profile-picture" src="https://via.placeholder.com/150" alt="Profile Picture">
+                <div>
+                    <h1 id="providerName" class="profile-name">Dr. Jane Doe</h1>
+                    <p id="providerRole" class="profile-role">Psychologist</p>
+                    <div id="providerStatus" class="profile-status">Active</div>
+                </div>
+            </div>
+            
+            <div class="profile-card">
+                <h2 class="section-title">
+                    Personal Information
+                    <button id="editPersonalBtn" class="edit-btn">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                </h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Title</div>
+                        <div id="titleValue" class="info-value">Dr.</div>
+                        <select id="titleEdit" class="editable">
+                            <option value="Dr.">Dr.</option>
+                            <option value="Prof.">Prof.</option>
+                            <option value="Mr.">Mr.</option>
+                            <option value="Mrs.">Mrs.</option>
+                            <option value="Ms.">Ms.</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <input type="text" id="otherTitleEdit" class="editable" placeholder="Specify title" style="display: none;">
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">First Name</div>
+                        <div id="firstNameValue" class="info-value">Jane</div>
+                        <input type="text" id="firstNameEdit" class="editable">
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Last Name</div>
+                        <div id="lastNameValue" class="info-value">Doe</div>
+                        <input type="text" id="lastNameEdit" class="editable">
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Gender</div>
+                        <div id="genderValue" class="info-value">Female</div>
+                        <select id="genderEdit" class="editable">
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Non-binary">Non-binary</option>
+                            <option value="Prefer not to say">Prefer not to say</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <input type="text" id="otherGenderEdit" class="editable" placeholder="Specify gender" style="display: none;">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="profile-card">
+                <h2 class="section-title">
+                    Professional Information
+                    <button id="editProfessionalBtn" class="edit-btn">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                </h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Professional Role</div>
+                        <div id="roleValue" class="info-value">Psychologist</div>
+                        <select id="roleEdit" class="editable">
+                            <option value="Psychiatrist">Psychiatrist</option>
+                            <option value="Psychologist">Psychologist</option>
+                            <option value="Therapist">Therapist</option>
+                            <option value="Counselor">Counselor</option>
+                            <option value="Social Worker">Social Worker</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <input type="text" id="otherRoleEdit" class="editable" placeholder="Specify role" style="display: none;">
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Years of Experience</div>
+                        <div id="experienceValue" class="info-value">8</div>
+                        <input type="number" id="experienceEdit" class="editable" min="0" max="50">
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">License Number</div>
+                        <div id="licenseValue" class="info-value">PSY123456</div>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Specializations</div>
+                    <div id="specializationsValue" class="specializations">
+                        <span class="specialization-tag">Anxiety</span>
+                        <span class="specialization-tag">Depression</span>
+                    </div>
+                    <div id="specializationsEdit" class="editable" style="display: none;">
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" name="specialization" value="Anxiety"> Anxiety</label>
+                            <label><input type="checkbox" name="specialization" value="Depression"> Depression</label>
+                            <label><input type="checkbox" name="specialization" value="Trauma"> Trauma</label>
+                            <label><input type="checkbox" name="specialization" value="Addiction"> Addiction</label>
+                            <label><input type="checkbox" name="specialization" value="Child Therapy"> Child Therapy</label>
+                            <label><input type="checkbox" name="specialization" value="Couples Therapy"> Couples Therapy</label>
+                            <label><input type="checkbox" name="specialization" value="Family Therapy"> Family Therapy</label>
+                            <label><input type="checkbox" name="specialization" value="Other"> Other</label>
+                            <input type="text" id="otherSpecializationEdit" class="editable" placeholder="Specify specialization" style="display: none; margin-top: 10px; width: 100%;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="profile-card">
+                <h2 class="section-title">
+                    Contact Information
+                    <button id="editContactBtn" class="edit-btn">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                </h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Email</div>
+                        <div id="emailValue" class="info-value">jane.doe@example.com</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Phone</div>
+                        <div id="phoneValue" class="info-value">(555) 123-4567</div>
+                        <input type="tel" id="phoneEdit" class="editable">
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">City</div>
+                        <div id="cityValue" class="info-value">New York</div>
+                        <input type="text" id="cityEdit" class="editable">
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">State/Province</div>
+                        <div id="stateValue" class="info-value">NY</div>
+                        <input type="text" id="stateEdit" class="editable">
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Country</div>
+                        <div id="countryValue" class="info-value">United States</div>
+                        <input type="text" id="countryEdit" class="editable">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="profile-card">
+                <h2 class="section-title">
+                    Languages Spoken
+                    <button id="editLanguagesBtn" class="edit-btn">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                </h2>
+                <div id="languagesValue">
+                    <span class="language-tag">English</span>
+                    <span class="language-tag">Spanish</span>
+                </div>
+                <div id="languagesEdit" class="editable" style="display: none;">
+                    <div id="languageInputs">
+                        <div class="language-input-group" style="margin-bottom: 10px;">
+                            <input type="text" class="language-input" placeholder="e.g., English" value="English" style="width: calc(100% - 30px);">
+                            <button type="button" class="remove-language-btn" style="background: none; border: none; color: #ff6b6b; cursor: pointer;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="language-input-group" style="margin-bottom: 10px;">
+                            <input type="text" class="language-input" placeholder="e.g., Spanish" value="Spanish" style="width: calc(100% - 30px);">
+                            <button type="button" class="remove-language-btn" style="background: none; border: none; color: #ff6b6b; cursor: pointer;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="button" id="addLanguageBtn" style="background: none; border: none; color: var(--sky-blue); cursor: pointer; margin-top: 5px;">
+                        <i class="fas fa-plus"></i> Add Language
+                    </button>
+                </div>
+            </div>
+            
+            <div class="profile-card">
+                <h2 class="section-title">
+                    Availability
+                    <button id="editAvailabilityBtn" class="edit-btn">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                </h2>
+                <div id="availabilityValue">
+                    <div class="availability-day">
+                        <div class="day-title">Monday</div>
+                        <span class="time-slot">9:00 AM - 5:00 PM</span>
+                    </div>
+                    <div class="availability-day">
+                        <div class="day-title">Wednesday</div>
+                        <span class="time-slot">10:00 AM - 6:00 PM</span>
+                    </div>
+                </div>
+                <div id="availabilityEdit" class="editable" style="display: none;">
+                    <div class="checkbox-group" style="margin-bottom: 15px;">
+                        <label style="margin-right: 10px;"><input type="checkbox" name="available-day" value="Monday" checked> Monday</label>
+                        <label style="margin-right: 10px;"><input type="checkbox" name="available-day" value="Tuesday"> Tuesday</label>
+                        <label style="margin-right: 10px;"><input type="checkbox" name="available-day" value="Wednesday" checked> Wednesday</label>
+                        <label style="margin-right: 10px;"><input type="checkbox" name="available-day" value="Thursday"> Thursday</label>
+                        <label style="margin-right: 10px;"><input type="checkbox" name="available-day" value="Friday"> Friday</label>
+                        <label style="margin-right: 10px;"><input type="checkbox" name="available-day" value="Saturday"> Saturday</label>
+                        <label style="margin-right: 10px;"><input type="checkbox" name="available-day" value="Sunday"> Sunday</label>
+                    </div>
+                    <div id="availabilityDaysEdit">
+                        <!-- Dynamic availability sections will be added here -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="profile-card">
+                <h2 class="section-title">
+                    Professional Bio
+                    <button id="editBioBtn" class="edit-btn">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                </h2>
+                <div id="bioValue" class="info-value" style="white-space: pre-line;">
+                    Licensed psychologist with 8 years of experience specializing in anxiety and depression. 
+                    I provide evidence-based treatments including CBT and mindfulness approaches.
+                </div>
+                <textarea id="bioEdit" class="editable" rows="5" style="display: none;"></textarea>
+            </div>
+            
+            <div class="action-buttons">
+                <button id="cancelBtn" class="btn btn-cancel">Cancel</button>
+                <button id="saveBtn" class="btn btn-save">Save Changes</button>
+            </div>
+        </div>
+        
+        <div id="errorMessage" class="error-message" style="display: none;">
+            Unable to load profile. Please check the URL or try again later.
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get email from URL parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const providerEmail = urlParams.get('email');
+            
+            if (!providerEmail) {
+                showError("No email parameter provided in URL");
+                return;
+            }
+            
+            // Fetch provider data
+            fetchProviderData(providerEmail);
+            
+            // Setup edit functionality
+            setupEditButtons();
+            setupOtherInputFields();
+            setupSpecializationOther();
+            setupLanguageFields();
+            setupDayAvailability();
+            setupSaveCancelButtons();
+        });
+        
+        function fetchProviderData(email) {
+            fetch(`https://firebase-backend-6arf.onrender.com/care_providers?email=${encodeURIComponent(email)}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && !data.error) {
+                        displayProviderData(data);
+                    } else {
+                        throw new Error(data.error || 'No provider found');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching provider data:', error);
+                    showError(error.message);
+                });
+        }
+        
+        function displayProviderData(provider) {
+            // Hide loading, show content
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('profileContent').style.display = 'block';
+            
+            // Basic info
+            document.getElementById('profileImage').src = provider.profilePicture || 'https://via.placeholder.com/150';
+            document.getElementById('providerName').textContent = provider.full_name || '';
+            document.getElementById('providerRole').textContent = provider.role || '';
+            document.getElementById('providerStatus').textContent = provider.status || 'Pending';
+            
+            // Parse title, first name, last name from full_name
+            const nameParts = provider.full_name ? provider.full_name.split(' ') : [];
+            let title = '', firstName = '', lastName = '';
+            if (nameParts.length > 0) title = nameParts[0];
+            if (nameParts.length > 1) firstName = nameParts[1];
+            if (nameParts.length > 2) lastName = nameParts.slice(2).join(' ');
+            
+            // Personal info
+            document.getElementById('titleValue').textContent = title;
+            document.getElementById('firstNameValue').textContent = firstName;
+            document.getElementById('lastNameValue').textContent = lastName;
+            document.getElementById('genderValue').textContent = provider.gender || '';
+            
+            // Professional info
+            document.getElementById('roleValue').textContent = provider.role || '';
+            document.getElementById('experienceValue').textContent = provider.years_experience || '0';
+            document.getElementById('licenseValue').textContent = provider.license_number || '';
+            
+            // Specializations
+            const specializationsContainer = document.getElementById('specializationsValue');
+            specializationsContainer.innerHTML = '';
+            if (provider.specializations && provider.specializations.length > 0) {
+                provider.specializations.forEach(spec => {
+                    const tag = document.createElement('span');
+                    tag.className = 'specialization-tag';
+                    tag.textContent = spec;
+                    specializationsContainer.appendChild(tag);
+                });
+            }
+            
+            // Contact info
+            document.getElementById('emailValue').textContent = provider.email || '';
+            document.getElementById('phoneValue').textContent = provider.phone || '';
+            document.getElementById('cityValue').textContent = provider.location?.city || '';
+            document.getElementById('stateValue').textContent = provider.location?.state || '';
+            document.getElementById('countryValue').textContent = provider.location?.country || '';
+            
+            // Languages
+            const languagesContainer = document.getElementById('languagesValue');
+            languagesContainer.innerHTML = '';
+            if (provider.languages && provider.languages.length > 0) {
+                provider.languages.forEach(lang => {
+                    const tag = document.createElement('span');
+                    tag.className = 'language-tag';
+                    tag.textContent = lang;
+                    languagesContainer.appendChild(tag);
+                });
+            }
+            
+            // Availability
+            const availabilityContainer = document.getElementById('availabilityValue');
+            availabilityContainer.innerHTML = '';
+            if (provider.availability && provider.availability.length > 0) {
+                provider.availability.forEach(day => {
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'availability-day';
+                    
+                    const dayTitle = document.createElement('div');
+                    dayTitle.className = 'day-title';
+                    dayTitle.textContent = day.day;
+                    dayElement.appendChild(dayTitle);
+                    
+                    if (day.time_slots && day.time_slots.length > 0) {
+                        day.time_slots.forEach(slot => {
+                            const timeSlot = document.createElement('span');
+                            timeSlot.className = 'time-slot';
+                            timeSlot.textContent = `${slot.start} - ${slot.end}`;
+                            dayElement.appendChild(timeSlot);
+                        });
+                    }
+                    
+                    availabilityContainer.appendChild(dayElement);
+                });
+            }
+            
+            // Bio
+            document.getElementById('bioValue').textContent = provider.bio || '';
+            
+            // Set edit fields with current values
+            setEditFields(provider, nameParts);
+        }
+        
+        function setEditFields(provider, nameParts) {
+            // Personal info
+            document.getElementById('titleEdit').value = nameParts.length > 0 ? nameParts[0] : '';
+            document.getElementById('firstNameEdit').value = nameParts.length > 1 ? nameParts[1] : '';
+            document.getElementById('lastNameEdit').value = nameParts.length > 2 ? nameParts.slice(2).join(' ') : '';
+            document.getElementById('genderEdit').value = provider.gender || '';
+            
+            // Professional info
+            document.getElementById('roleEdit').value = provider.role || '';
+            document.getElementById('experienceEdit').value = provider.years_experience || '0';
+            
+            // Specializations checkboxes
+            if (provider.specializations) {
+                provider.specializations.forEach(spec => {
+                    const checkbox = document.querySelector(`input[name="specialization"][value="${spec}"]`);
+                    if (checkbox) checkbox.checked = true;
+                });
+            }
+            
+            // Contact info
+            document.getElementById('phoneEdit').value = provider.phone || '';
+            document.getElementById('cityEdit').value = provider.location?.city || '';
+            document.getElementById('stateEdit').value = provider.location?.state || '';
+            document.getElementById('countryEdit').value = provider.location?.country || '';
+            
+            // Languages inputs
+            const languageInputsContainer = document.getElementById('languageInputs');
+            languageInputsContainer.innerHTML = '';
+            if (provider.languages && provider.languages.length > 0) {
+                provider.languages.forEach(lang => {
+                    addLanguageInput(lang);
+                });
+            } else {
+                addLanguageInput('');
+            }
+            
+            // Availability checkboxes and time slots
+            if (provider.availability) {
+                provider.availability.forEach(day => {
+                    const checkbox = document.querySelector(`input[name="available-day"][value="${day.day}"]`);
+                    if (checkbox) checkbox.checked = true;
+                });
+                
+                // This will be handled by setupDayAvailability when edit mode is activated
+            }
+            
+            // Bio
+            document.getElementById('bioEdit').value = provider.bio || '';
+        }
+        
+        function showError(message) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorMessage').style.display = 'block';
+        }
+        
+        function setupEditButtons() {
+            // Personal info
+            document.getElementById('editPersonalBtn').addEventListener('click', function() {
+                document.querySelector('.profile-card:nth-child(2)').classList.add('editing');
+                document.getElementById('saveBtn').style.display = 'inline-block';
+                document.getElementById('cancelBtn').style.display = 'inline-block';
+            });
+            
+            // Professional info
+            document.getElementById('editProfessionalBtn').addEventListener('click', function() {
+                document.querySelector('.profile-card:nth-child(3)').classList.add('editing');
+                document.getElementById('saveBtn').style.display = 'inline-block';
+                document.getElementById('cancelBtn').style.display = 'inline-block';
+            });
+            
+            // Contact info
+            document.getElementById('editContactBtn').addEventListener('click', function() {
+                document.querySelector('.profile-card:nth-child(4)').classList.add('editing');
+                document.getElementById('saveBtn').style.display = 'inline-block';
+                document.getElementById('cancelBtn').style.display = 'inline-block';
+            });
+            
+            // Languages
+            document.getElementById('editLanguagesBtn').addEventListener('click', function() {
+                document.querySelector('.profile-card:nth-child(5)').classList.add('editing');
+                document.getElementById('saveBtn').style.display = 'inline-block';
+                document.getElementById('cancelBtn').style.display = 'inline-block';
+            });
+            
+            // Availability
+            document.getElementById('editAvailabilityBtn').addEventListener('click', function() {
+                document.querySelector('.profile-card:nth-child(6)').classList.add('editing');
+                document.getElementById('saveBtn').style.display = 'inline-block';
+                document.getElementById('cancelBtn').style.display = 'inline-block';
+                setupDayAvailabilityEditMode();
+            });
+            
+            // Bio
+            document.getElementById('editBioBtn').addEventListener('click', function() {
+                document.querySelector('.profile-card:nth-child(7)').classList.add('editing');
+                document.getElementById('saveBtn').style.display = 'inline-block';
+                document.getElementById('cancelBtn').style.display = 'inline-block';
+            });
+        }
+        
+        function setupOtherInputFields() {
+            // Title "Other" field
+            document.getElementById('titleEdit').addEventListener('change', function() {
+                document.getElementById('otherTitleEdit').style.display = 
+                    this.value === 'Other' ? 'block' : 'none';
+                if (this.value !== 'Other') document.getElementById('otherTitleEdit').value = '';
+            });
+            
+            // Gender "Other" field
+            document.getElementById('genderEdit').addEventListener('change', function() {
+                document.getElementById('otherGenderEdit').style.display = 
+                    this.value === 'Other' ? 'block' : 'none';
+                if (this.value !== 'Other') document.getElementById('otherGenderEdit').value = '';
+            });
+            
+            // Role "Other" field
+            document.getElementById('roleEdit').addEventListener('change', function() {
+                document.getElementById('otherRoleEdit').style.display = 
+                    this.value === 'Other' ? 'block' : 'none';
+                if (this.value !== 'Other') document.getElementById('otherRoleEdit').value = '';
+            });
+        }
+        
+        function setupSpecializationOther() {
+            document.querySelector('input[name="specialization"][value="Other"]')
+                .addEventListener('change', function() {
+                    document.getElementById('otherSpecializationEdit').style.display = 
+                        this.checked ? 'block' : 'none';
+                    if (!this.checked) document.getElementById('otherSpecializationEdit').value = '';
+                });
+        }
+        
+        function setupLanguageFields() {
+            document.getElementById('addLanguageBtn').addEventListener('click', function() {
+                addLanguageInput('');
+            });
+            
+            // Event delegation for remove buttons
+            document.getElementById('languageInputs').addEventListener('click', function(e) {
+                if (e.target.classList.contains('remove-language-btn') || 
+                    e.target.closest('.remove-language-btn')) {
+                    const group = e.target.closest('.language-input-group');
+                    if (group && document.querySelectorAll('.language-input-group').length > 1) {
+                        group.remove();
+                    }
+                }
+            });
+        }
+        
+        function addLanguageInput(value = '') {
+            const group = document.createElement('div');
+            group.className = 'language-input-group';
+            group.style.marginBottom = '10px';
+            group.innerHTML = `
+                <input type="text" class="language-input" placeholder="e.g., English" value="${value}" style="width: calc(100% - 30px);">
+                <button type="button" class="remove-language-btn" style="background: none; border: none; color: #ff6b6b; cursor: pointer;">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            document.getElementById('languageInputs').appendChild(group);
+        }
+        
+        function setupDayAvailability() {
+            // Handle day checkbox changes in edit mode
+            document.querySelectorAll('input[name="available-day"]').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        addDayAvailabilityEdit(this.value);
+                    } else {
+                        removeDayAvailabilityEdit(this.value);
+                    }
+                });
+            });
+        }
+        
+        function setupDayAvailabilityEditMode() {
+            // Clear existing edit sections
+            document.getElementById('availabilityDaysEdit').innerHTML = '';
+            
+            // Add sections for checked days
+            document.querySelectorAll('input[name="available-day"]:checked').forEach(checkbox => {
+                addDayAvailabilityEdit(checkbox.value);
+            });
+        }
+        
+        function addDayAvailabilityEdit(day) {
+            const container = document.getElementById('availabilityDaysEdit');
+            
+            // Check if this day already exists
+            if (document.getElementById(`day-edit-${day}`)) return;
+            
+            const dayElement = document.createElement('div');
+            dayElement.className = 'day-availability';
+            dayElement.id = `day-edit-${day}`;
+            dayElement.innerHTML = `
+                <div class="day-header">
+                    <div class="day-title">${day}</div>
+                </div>
+                <div class="time-slots-container" id="time-slots-edit-${day}">
+                    <div class="time-slot-row">
+                        <select class="start-time" required>
+                            <option value="">Start Time</option>
+                            <option value="8:00 AM">8:00 AM</option>
+                            <option value="9:00 AM">9:00 AM</option>
+                            <option value="10:00 AM">10:00 AM</option>
+                            <option value="11:00 AM">11:00 AM</option>
+                            <option value="12:00 PM">12:00 PM</option>
+                            <option value="1:00 PM">1:00 PM</option>
+                            <option value="2:00 PM">2:00 PM</option>
+                            <option value="3:00 PM">3:00 PM</option>
+                            <option value="4:00 PM">4:00 PM</option>
+                            <option value="5:00 PM">5:00 PM</option>
+                            <option value="6:00 PM">6:00 PM</option>
+                            <option value="7:00 PM">7:00 PM</option>
+                            <option value="8:00 PM">8:00 PM</option>
+                        </select>
+                        <span>to</span>
+                        <input type="text" class="end-time" readonly>
+                        <button type="button" class="remove-time-slot-btn" style="background: none; border: none; color: #ff6b6b; cursor: pointer;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="button" class="add-time-slot-btn" data-day="${day}" style="background: none; border: none; color: var(--sky-blue); cursor: pointer; margin-top: 5px;">
+                    <i class="fas fa-plus"></i> Add Time Slot
+                </button>
+            `;
+            
+            container.appendChild(dayElement);
+            
+            // Set up time slot interactions
+            setupTimeSlotInteractions(day);
+        }
+        
+        function removeDayAvailabilityEdit(day) {
+            const element = document.getElementById(`day-edit-${day}`);
+            if (element) {
+                element.remove();
+            }
+        }
+        
+        function setupTimeSlotInteractions(day) {
+            const container = document.getElementById(`time-slots-edit-${day}`);
+            
+            // Add time slot button
+            container.parentElement.querySelector('.add-time-slot-btn').addEventListener('click', function() {
+                addTimeSlotEdit(day);
+            });
+            
+            // Remove time slot buttons
+            container.addEventListener('click', function(e) {
+                if (e.target.classList.contains('remove-time-slot-btn') || 
+                    e.target.closest('.remove-time-slot-btn')) {
+                    const slotRow = e.target.closest('.time-slot-row');
+                    if (slotRow && container.querySelectorAll('.time-slot-row').length > 1) {
+                        slotRow.remove();
+                    }
+                }
+            });
+            
+            // Start time changes to auto-fill end time
+            container.addEventListener('change', function(e) {
+                if (e.target.classList.contains('start-time')) {
+                    const startTime = e.target.value;
+                    if (startTime) {
+                        const endTimeInput = e.target.closest('.time-slot-row').querySelector('.end-time');
+                        const endTime = calculateEndTime(startTime);
+                        endTimeInput.value = endTime;
+                    }
+                }
+            });
+        }
+        
+        function addTimeSlotEdit(day) {
+            const container = document.getElementById(`time-slots-edit-${day}`);
+            const newSlot = document.createElement('div');
+            newSlot.className = 'time-slot-row';
+            newSlot.innerHTML = `
+                <select class="start-time" required>
+                    <option value="">Start Time</option>
+                    <option value="8:00 AM">8:00 AM</option>
+                    <option value="9:00 AM">9:00 AM</option>
+                    <option value="10:00 AM">10:00 AM</option>
+                    <option value="11:00 AM">11:00 AM</option>
+                    <option value="12:00 PM">12:00 PM</option>
+                    <option value="1:00 PM">1:00 PM</option>
+                    <option value="2:00 PM">2:00 PM</option>
+                    <option value="3:00 PM">3:00 PM</option>
+                    <option value="4:00 PM">4:00 PM</option>
+                    <option value="5:00 PM">5:00 PM</option>
+                    <option value="6:00 PM">6:00 PM</option>
+                    <option value="7:00 PM">7:00 PM</option>
+                    <option value="8:00 PM">8:00 PM</option>
+                </select>
+                <span>to</span>
+                <input type="text" class="end-time" readonly>
+                <button type="button" class="remove-time-slot-btn" style="background: none; border: none; color: #ff6b6b; cursor: pointer;">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            container.appendChild(newSlot);
+        }
+        
+        function calculateEndTime(startTime) {
+            const [time, period] = startTime.split(' ');
+            let [hours, minutes] = time.split(':').map(Number);
+            
+            if (period === 'PM' && hours !== 12) hours += 12;
+            if (period === 'AM' && hours === 12) hours = 0;
+            
+            hours += 1;
+            
+            let newPeriod = 'AM';
+            if (hours >= 12) {
+                newPeriod = 'PM';
+                if (hours > 12) hours -= 12;
+            }
+            if (hours === 0) hours = 12;
+            
+            minutes = minutes.toString().padStart(2, '0');
+            
+            return `${hours}:${minutes} ${newPeriod}`;
+        }
+        
+        function setupSaveCancelButtons() {
+            document.getElementById('saveBtn').addEventListener('click', saveChanges);
+            document.getElementById('cancelBtn').addEventListener('click', cancelEditing);
+        }
+        
+        function saveChanges() {
+            // Get all edited values
+            const updatedProvider = {
+                full_name: getFullNameEdit(),
+                gender: getGenderEdit(),
+                role: getRoleEdit(),
+                specializations: getSpecializationsEdit(),
+                years_experience: parseInt(document.getElementById('experienceEdit').value) || 0,
+                phone: document.getElementById('phoneEdit').value,
+                location: {
+                    city: document.getElementById('cityEdit').value,
+                    state: document.getElementById('stateEdit').value,
+                    country: document.getElementById('countryEdit').value
+                },
+                languages: getLanguagesEdit(),
+                availability: getAvailabilityEdit(),
+                bio: document.getElementById('bioEdit').value
+            };
+            
+            // Get email from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const providerEmail = urlParams.get('email');
+            
+            // Show loading
+            document.getElementById('loading').style.display = 'flex';
+            
+            // Send update to server
+            fetch(`https://firebase-backend-6arf.onrender.com/care_providers?email=${encodeURIComponent(providerEmail)}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedProvider)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data && !data.error) {
+                    // Refresh the displayed data
+                    displayProviderData(data);
+                    // Exit edit mode
+                    cancelEditing();
+                    // Show success message
+                    alert('Profile updated successfully!');
+                } else {
+                    throw new Error(data.error || 'Update failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error updating provider data:', error);
+                alert('Error updating profile: ' + error.message);
+            })
+            .finally(() => {
+                document.getElementById('loading').style.display = 'none';
+            });
+        }
+        
+        function getFullNameEdit() {
+            const title = document.getElementById('titleEdit').value === 'Other' ? 
+                document.getElementById('otherTitleEdit').value : document.getElementById('titleEdit').value;
+            const firstName = document.getElementById('firstNameEdit').value;
+            const lastName = document.getElementById('lastNameEdit').value;
+            return `${title} ${firstName} ${lastName}`.trim();
+        }
+        
+        function getGenderEdit() {
+            return document.getElementById('genderEdit').value === 'Other' ? 
+                document.getElementById('otherGenderEdit').value : document.getElementById('genderEdit').value;
+        }
+        
+        function getRoleEdit() {
+            return document.getElementById('roleEdit').value === 'Other' ? 
+                document.getElementById('otherRoleEdit').value : document.getElementById('roleEdit').value;
+        }
+        
+        function getSpecializationsEdit() {
+            const specializations = Array.from(document.querySelectorAll('input[name="specialization"]:checked'))
+                .map(el => el.value === 'Other' ? 
+                    document.getElementById('otherSpecializationEdit').value : el.value);
+            
+            return specializations.filter(spec => spec !== '');
+        }
+        
+        function getLanguagesEdit() {
+            return Array.from(document.querySelectorAll('.language-input'))
+                .map(input => input.value.trim())
+                .filter(lang => lang !== '');
+        }
+        
+        function getAvailabilityEdit() {
+            const availability = [];
+            
+            document.querySelectorAll('input[name="available-day"]:checked').forEach(checkbox => {
+                const day = checkbox.value;
+                const timeSlotsContainer = document.getElementById(`time-slots-edit-${day}`);
+                
+                if (timeSlotsContainer) {
+                    const timeSlots = [];
+                    
+                    timeSlotsContainer.querySelectorAll('.time-slot-row').forEach(row => {
+                        const startTime = row.querySelector('.start-time').value;
+                        const endTime = row.querySelector('.end-time').value;
+                        
+                        if (startTime && endTime) {
+                            timeSlots.push({
+                                start: startTime,
+                                end: endTime
+                            });
+                        }
+                    });
+                    
+                    if (timeSlots.length > 0) {
+                        availability.push({
+                            day: day,
+                            time_slots: timeSlots
+                        });
+                    }
+                }
+            });
+            
+            return availability;
+        }
+        
+        function cancelEditing() {
+            // Exit edit mode for all sections
+            document.querySelectorAll('.profile-card').forEach(card => {
+                card.classList.remove('editing');
+            });
+            
+            // Hide save/cancel buttons
+            document.getElementById('saveBtn').style.display = 'none';
+            document.getElementById('cancelBtn').style.display = 'none';
+            
+            // Reload original data (in case any changes were made but not saved)
+            const urlParams = new URLSearchParams(window.location.search);
+            const providerEmail = urlParams.get('email');
+            fetchProviderData(providerEmail);
+        }
+    </script>
+</body>
+</html>
