@@ -606,49 +606,85 @@
         }
 
         // Update the displayProviderData function
+                // Replace the fetchProviderData function
+        function fetchProviderData(email) {
+            console.log(`Fetching data for email: ${email}`);
+            
+            // Show loading state
+            document.getElementById('loading').style.display = 'flex';
+            document.getElementById('profileContent').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'none';
+
+            fetch(`https://firebase-backend-6arf.onrender.com/care_providers?email=${encodeURIComponent(email)}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(providerData => {
+                    console.log('Received provider data:', providerData);
+                    if (providerData && !providerData.error) {
+                        displayProviderData(providerData);
+                    } else {
+                        throw new Error(providerData?.error || 'No provider data received');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching provider data:', error);
+                    showError(`Failed to load profile: ${error.message}`);
+                    
+                    // For debugging - show the error in console
+                    console.log('Full error details:', error);
+                });
+        }
+
+        // Update the displayProviderData function
         function displayProviderData(provider) {
             try {
+                console.log('Displaying provider:', provider); // Debug log
+                
                 // Hide loading, show content
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('profileContent').style.display = 'block';
 
-                // Set profile picture - using profile_picture_url from the data
+                // Set profile picture
                 const profileImage = document.getElementById('profileImage');
                 if (provider.profile_picture_url) {
                     profileImage.src = provider.profile_picture_url;
+                    console.log('Setting profile image to:', provider.profile_picture_url);
                 } else {
-                    // Fallback SVG if no picture is available
+                    // Fallback SVG
                     profileImage.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 24 24" fill="%2387CEEB"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>';
                 }
                 profileImage.alt = provider.full_name || 'Provider image';
 
-                // Basic info
-                document.getElementById('providerName').textContent = provider.full_name || 'No name provided';
-                document.getElementById('providerRole').textContent = provider.role || 'Role not specified';
-                document.getElementById('providerStatus').textContent = provider.status || 'Status unknown';
+                // Basic info - using nullish coalescing for fallbacks
+                document.getElementById('providerName').textContent = provider.full_name ?? 'No name provided';
+                document.getElementById('providerRole').textContent = provider.role ?? 'Role not specified';
+                document.getElementById('providerStatus').textContent = provider.status ?? 'Status unknown';
 
-                // Parse name parts for title, first name, last name
-                const nameParts = provider.full_name ? provider.full_name.split(' ') : [];
-                let title = '', firstName = '', lastName = '';
-                if (nameParts.length > 0) title = nameParts[0];
-                if (nameParts.length > 1) firstName = nameParts[1];
-                if (nameParts.length > 2) lastName = nameParts.slice(2).join(' ');
+                // Parse name parts
+                const nameParts = provider.full_name?.split(' ') ?? [];
+                const title = nameParts[0] ?? '';
+                const firstName = nameParts[1] ?? '';
+                const lastName = nameParts.slice(2).join(' ') ?? '';
 
                 // Personal info
                 document.getElementById('titleValue').textContent = title;
                 document.getElementById('firstNameValue').textContent = firstName;
                 document.getElementById('lastNameValue').textContent = lastName;
-                document.getElementById('genderValue').textContent = provider.gender || '';
+                document.getElementById('genderValue').textContent = provider.gender ?? '';
 
                 // Professional info
-                document.getElementById('roleValue').textContent = provider.role || '';
-                document.getElementById('experienceValue').textContent = provider.years_experience || '0';
-                document.getElementById('licenseValue').textContent = provider.license_number || '';
+                document.getElementById('roleValue').textContent = provider.role ?? '';
+                document.getElementById('experienceValue').textContent = provider.years_experience ?? '0';
+                document.getElementById('licenseValue').textContent = provider.license_number ?? '';
 
                 // Specializations
                 const specializationsContainer = document.getElementById('specializationsValue');
                 specializationsContainer.innerHTML = '';
-                if (provider.specializations && provider.specializations.length > 0) {
+                if (provider.specializations?.length > 0) {
                     provider.specializations.forEach(spec => {
                         const tag = document.createElement('span');
                         tag.className = 'specialization-tag';
@@ -658,16 +694,16 @@
                 }
 
                 // Contact info
-                document.getElementById('emailValue').textContent = provider.email || '';
-                document.getElementById('phoneValue').textContent = provider.phone || '';
-                document.getElementById('cityValue').textContent = provider.location?.city || '';
-                document.getElementById('stateValue').textContent = provider.location?.state || '';
-                document.getElementById('countryValue').textContent = provider.location?.country || '';
+                document.getElementById('emailValue').textContent = provider.email ?? '';
+                document.getElementById('phoneValue').textContent = provider.phone ?? '';
+                document.getElementById('cityValue').textContent = provider.location?.city ?? '';
+                document.getElementById('stateValue').textContent = provider.location?.state ?? '';
+                document.getElementById('countryValue').textContent = provider.location?.country ?? '';
 
                 // Languages
                 const languagesContainer = document.getElementById('languagesValue');
                 languagesContainer.innerHTML = '';
-                if (provider.languages && provider.languages.length > 0) {
+                if (provider.languages?.length > 0) {
                     provider.languages.forEach(lang => {
                         const tag = document.createElement('span');
                         tag.className = 'language-tag';
@@ -679,21 +715,21 @@
                 // Availability
                 const availabilityContainer = document.getElementById('availabilityValue');
                 availabilityContainer.innerHTML = '';
-                if (provider.availability && provider.availability.length > 0) {
+                if (provider.availability?.length > 0) {
                     provider.availability.forEach(day => {
                         const dayElement = document.createElement('div');
                         dayElement.className = 'availability-day';
                         
                         const dayTitle = document.createElement('div');
                         dayTitle.className = 'day-title';
-                        dayTitle.textContent = day.day;
+                        dayTitle.textContent = day.day ?? '';
                         dayElement.appendChild(dayTitle);
                         
-                        if (day.time_slots && day.time_slots.length > 0) {
+                        if (day.time_slots?.length > 0) {
                             day.time_slots.forEach(slot => {
                                 const timeSlot = document.createElement('span');
                                 timeSlot.className = 'time-slot';
-                                timeSlot.textContent = `${slot.start} - ${slot.end}`;
+                                timeSlot.textContent = `${slot.start ?? ''} - ${slot.end ?? ''}`;
                                 dayElement.appendChild(timeSlot);
                             });
                         }
@@ -703,7 +739,7 @@
                 }
 
                 // Bio
-                document.getElementById('bioValue').textContent = provider.bio || '';
+                document.getElementById('bioValue').textContent = provider.bio ?? '';
 
             } catch (error) {
                 console.error('Error displaying provider data:', error);
