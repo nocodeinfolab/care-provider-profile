@@ -329,47 +329,23 @@
             </div>
             
             <div class="profile-card">
-                <h2 class="section-title">
-                    Personal Information
-                    <button id="editPersonalBtn" class="edit-btn">
-                        <i class="fas fa-edit"></i> Edit
-                    </button>
-                </h2>
+                <h2 class="section-title">Personal Information</h2>
                 <div class="info-grid">
                     <div class="info-item">
                         <div class="info-label">Title</div>
                         <div id="titleValue" class="info-value">Dr.</div>
-                        <select id="titleEdit" class="editable">
-                            <option value="Dr.">Dr.</option>
-                            <option value="Prof.">Prof.</option>
-                            <option value="Mr.">Mr.</option>
-                            <option value="Mrs.">Mrs.</option>
-                            <option value="Ms.">Ms.</option>
-                            <option value="Other">Other</option>
-                        </select>
-                        <input type="text" id="otherTitleEdit" class="editable" placeholder="Specify title" style="display: none;">
                     </div>
                     <div class="info-item">
                         <div class="info-label">First Name</div>
                         <div id="firstNameValue" class="info-value">Jane</div>
-                        <input type="text" id="firstNameEdit" class="editable">
                     </div>
                     <div class="info-item">
                         <div class="info-label">Last Name</div>
                         <div id="lastNameValue" class="info-value">Doe</div>
-                        <input type="text" id="lastNameEdit" class="editable">
                     </div>
                     <div class="info-item">
                         <div class="info-label">Gender</div>
                         <div id="genderValue" class="info-value">Female</div>
-                        <select id="genderEdit" class="editable">
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Non-binary">Non-binary</option>
-                            <option value="Prefer not to say">Prefer not to say</option>
-                            <option value="Other">Other</option>
-                        </select>
-                        <input type="text" id="otherGenderEdit" class="editable" placeholder="Specify gender" style="display: none;">
                     </div>
                 </div>
             </div>
@@ -554,7 +530,7 @@
     </div>
 
     <script>
-                // =============================================
+        // =============================================
         // Core Data Functions
         // =============================================
 
@@ -1179,6 +1155,6 @@
             setupDayAvailability();
             setupSaveCancelButtons();
         });
-        </script>
+    </script>
 </body>
 </html>
