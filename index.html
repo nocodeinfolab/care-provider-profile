@@ -331,7 +331,9 @@
             <div class="profile-card">
                 <h2 class="section-title">
                     Personal Information
-                    
+                    <button id="editPersonalBtn" class="edit-btn">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
                 </h2>
                 <div class="info-grid">
                     <div class="info-item">
@@ -534,7 +536,8 @@
                     </button>
                 </h2>
                 <div id="bioValue" class="info-value" style="white-space: pre-line;">
-                    <!-- Bio content will appear here -->
+                    Licensed psychologist with 8 years of experience specializing in anxiety and depression. 
+                    I provide evidence-based treatments including CBT and mindfulness approaches.
                 </div>
                 <textarea id="bioEdit" class="editable" rows="5" style="display: none;"></textarea>
             </div>
@@ -714,7 +717,10 @@
         // =============================================
 
         function setupEditButtons() {
-            
+            document.getElementById('editPersonalBtn').addEventListener('click', function() {
+                document.querySelector('.profile-card:nth-child(2)').classList.add('editing');
+                toggleSaveCancelButtons(true);
+            });
             
             document.getElementById('editProfessionalBtn').addEventListener('click', function() {
                 document.querySelector('.profile-card:nth-child(3)').classList.add('editing');
@@ -738,15 +744,7 @@
             });
             
             document.getElementById('editBioBtn').addEventListener('click', function() {
-                const card = this.closest('.profile-card');
-                card.classList.add('editing');
-                
-                // Get current bio text
-                const currentBio = document.getElementById('bioValue').textContent;
-                
-                // Populate the textarea with current bio
-                document.getElementById('bioEdit').value = currentBio;
-                
+                document.querySelector('.profile-card:nth-child(7)').classList.add('editing');
                 toggleSaveCancelButtons(true);
             });
         }
