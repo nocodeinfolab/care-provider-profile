@@ -717,32 +717,35 @@
         // =============================================
 
         function setupEditButtons() {
-            document.getElementById('editPersonalBtn').addEventListener('click', function() {
-                document.querySelector('.profile-card:nth-child(2)').classList.add('editing');
-                toggleSaveCancelButtons(true);
-            });
-            
+            // Professional info edit button
             document.getElementById('editProfessionalBtn').addEventListener('click', function() {
                 document.querySelector('.profile-card:nth-child(3)').classList.add('editing');
                 toggleSaveCancelButtons(true);
             });
             
+            // Contact info edit button
             document.getElementById('editContactBtn').addEventListener('click', function() {
                 document.querySelector('.profile-card:nth-child(4)').classList.add('editing');
                 toggleSaveCancelButtons(true);
             });
             
+            // Languages edit button
             document.getElementById('editLanguagesBtn').addEventListener('click', function() {
-                document.querySelector('.profile-card:nth-child(5)').classList.add('editing');
+                const card = document.querySelector('.profile-card:nth-child(5)');
+                card.classList.add('editing');
                 toggleSaveCancelButtons(true);
+                setupLanguagesEditMode();
             });
             
+            // Availability edit button
             document.getElementById('editAvailabilityBtn').addEventListener('click', function() {
-                document.querySelector('.profile-card:nth-child(6)').classList.add('editing');
+                const card = document.querySelector('.profile-card:nth-child(6)');
+                card.classList.add('editing');
                 toggleSaveCancelButtons(true);
-                setupDayAvailabilityEditMode();
+                setupAvailabilityEditMode();
             });
             
+            // Bio edit button
             document.getElementById('editBioBtn').addEventListener('click', function() {
                 document.querySelector('.profile-card:nth-child(7)').classList.add('editing');
                 toggleSaveCancelButtons(true);
@@ -754,11 +757,54 @@
             document.getElementById('cancelBtn').style.display = show ? 'inline-block' : 'none';
         }
 
-        function setupDayAvailabilityEditMode() {
-            document.getElementById('availabilityDaysEdit').innerHTML = '';
-            document.querySelectorAll('input[name="available-day"]:checked').forEach(checkbox => {
-                addDayAvailabilityEdit(checkbox.value);
-            });
+        function setupLanguagesEditMode() {
+            const languagesContainer = document.getElementById('languageInputs');
+            languagesContainer.innerHTML = '';
+            
+            // Get current languages from display
+            const languageTags = document.querySelectorAll('#languagesValue .language-tag');
+            
+            if (languageTags.length > 0) {
+                languageTags.forEach(tag => {
+                    addLanguageInput(tag.textContent);
+                });
+            } else {
+                addLanguageInput('');
+            }
+        }
+
+        function setupAvailabilityEditMode() {
+            const availabilityEditContainer = document.getElementById('availabilityDaysEdit');
+            availabilityEditContainer.innerHTML = '';
+            
+            // Get current availability from display
+            const availabilityDays = document.querySelectorAll('#availabilityValue .availability-day');
+            
+            if (availabilityDays.length > 0) {
+                availabilityDays.forEach(dayElement => {
+                    const day = dayElement.querySelector('.day-title').textContent;
+                    const timeSlots = dayElement.querySelectorAll('.time-slot');
+                    
+                    // Check the checkbox for this day
+                    const checkbox = document.querySelector(`input[name="available-day"][value="${day}"]`);
+                    if (checkbox) checkbox.checked = true;
+                    
+                    // Add day to edit container
+                    addDayAvailabilityEdit(day);
+                    
+                    // Add time slots
+                    const timeSlotsContainer = document.getElementById(`time-slots-edit-${day}`);
+                    timeSlotsContainer.innerHTML = '';
+                    
+                    timeSlots.forEach(slot => {
+                        const timeRange = slot.textContent.split(' - ');
+                        if (timeRange.length === 2) {
+                            const [startTime, endTime] = timeRange;
+                            addTimeSlotEdit(day, startTime, endTime);
+                        }
+                    });
+                });
+            }
         }
 
         function addDayAvailabilityEdit(day) {
@@ -806,6 +852,50 @@
             setupTimeSlotInteractions(day);
         }
 
+        function addTimeSlotEdit(day, startTime = '', endTime = '') {
+            const container = document.getElementById(`time-slots-edit-${day}`);
+            const newSlot = document.createElement('div');
+            newSlot.className = 'time-slot-row';
+            newSlot.innerHTML = `
+                <select class="start-time" required>
+                    <option value="">Start Time</option>
+                    <option value="8:00 AM">8:00 AM</option>
+                    <option value="9:00 AM">9:00 AM</option>
+                    <option value="10:00 AM">10:00 AM</option>
+                    <option value="11:00 AM">11:00 AM</option>
+                    <option value="12:00 PM">12:00 PM</option>
+                    <option value="1:00 PM">1:00 PM</option>
+                    <option value="2:00 PM">2:00 PM</option>
+                    <option value="3:00 PM">3:00 PM</option>
+                    <option value="4:00 PM">4:00 PM</option>
+                    <option value="5:00 PM">5:00 PM</option>
+                    <option value="6:00 PM">6:00 PM</option>
+                    <option value="7:00 PM">7:00 PM</option>
+                    <option value="8:00 PM">8:00 PM</option>
+                </select>
+                <span>to</span>
+                <input type="text" class="end-time" readonly>
+                <button type="button" class="remove-time-slot-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            // Set values if provided
+            if (startTime) {
+                const startSelect = newSlot.querySelector('.start-time');
+                const option = Array.from(startSelect.options).find(opt => opt.value === startTime);
+                if (option) option.selected = true;
+            }
+            
+            if (endTime) {
+                newSlot.querySelector('.end-time').value = endTime;
+            } else if (startTime) {
+                newSlot.querySelector('.end-time').value = calculateEndTime(startTime);
+            }
+            
+            container.appendChild(newSlot);
+        }
+
         function setupTimeSlotInteractions(day) {
             const container = document.getElementById(`time-slots-edit-${day}`);
             
@@ -836,36 +926,6 @@
                     }
                 }
             });
-        }
-
-        function addTimeSlotEdit(day) {
-            const container = document.getElementById(`time-slots-edit-${day}`);
-            const newSlot = document.createElement('div');
-            newSlot.className = 'time-slot-row';
-            newSlot.innerHTML = `
-                <select class="start-time" required>
-                    <option value="">Start Time</option>
-                    <option value="8:00 AM">8:00 AM</option>
-                    <option value="9:00 AM">9:00 AM</option>
-                    <option value="10:00 AM">10:00 AM</option>
-                    <option value="11:00 AM">11:00 AM</option>
-                    <option value="12:00 PM">12:00 PM</option>
-                    <option value="1:00 PM">1:00 PM</option>
-                    <option value="2:00 PM">2:00 PM</option>
-                    <option value="3:00 PM">3:00 PM</option>
-                    <option value="4:00 PM">4:00 PM</option>
-                    <option value="5:00 PM">5:00 PM</option>
-                    <option value="6:00 PM">6:00 PM</option>
-                    <option value="7:00 PM">7:00 PM</option>
-                    <option value="8:00 PM">8:00 PM</option>
-                </select>
-                <span>to</span>
-                <input type="text" class="end-time" readonly>
-                <button type="button" class="remove-time-slot-btn">
-                    <i class="fas fa-times"></i>
-                </button>
-            `;
-            container.appendChild(newSlot);
         }
 
         function calculateEndTime(startTime) {
@@ -911,8 +971,6 @@
             
             // Get all edited values
             const updatedProvider = {
-                full_name: getFullNameEdit(),
-                gender: getGenderEdit(),
                 role: getRoleEdit(),
                 specializations: getSpecializationsEdit(),
                 years_experience: parseInt(document.getElementById('experienceEdit').value) || 0,
@@ -971,21 +1029,7 @@
             }
         }
 
-
         // Helper functions for saveChanges()
-        function getFullNameEdit() {
-            const title = document.getElementById('titleEdit').value === 'Other' ? 
-                document.getElementById('otherTitleEdit').value : document.getElementById('titleEdit').value;
-            const firstName = document.getElementById('firstNameEdit').value;
-            const lastName = document.getElementById('lastNameEdit').value;
-            return `${title} ${firstName} ${lastName}`.trim();
-        }
-
-        function getGenderEdit() {
-            return document.getElementById('genderEdit').value === 'Other' ? 
-                document.getElementById('otherGenderEdit').value : document.getElementById('genderEdit').value;
-        }
-
         function getRoleEdit() {
             return document.getElementById('roleEdit').value === 'Other' ? 
                 document.getElementById('otherRoleEdit').value : document.getElementById('roleEdit').value;
@@ -1044,20 +1088,6 @@
         // =============================================
 
         function setupOtherInputFields() {
-            // Title "Other" field
-            document.getElementById('titleEdit').addEventListener('change', function() {
-                document.getElementById('otherTitleEdit').style.display = 
-                    this.value === 'Other' ? 'block' : 'none';
-                if (this.value !== 'Other') document.getElementById('otherTitleEdit').value = '';
-            });
-            
-            // Gender "Other" field
-            document.getElementById('genderEdit').addEventListener('change', function() {
-                document.getElementById('otherGenderEdit').style.display = 
-                    this.value === 'Other' ? 'block' : 'none';
-                if (this.value !== 'Other') document.getElementById('otherGenderEdit').value = '';
-            });
-            
             // Role "Other" field
             document.getElementById('roleEdit').addEventListener('change', function() {
                 document.getElementById('otherRoleEdit').style.display = 
@@ -1125,16 +1155,6 @@
         }
 
         // =============================================
-        // Utility Functions
-        // =============================================
-
-        function showError(message) {
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('errorMessage').textContent = message;
-            document.getElementById('errorMessage').style.display = 'block';
-        }
-
-        // =============================================
         // Initialize the Page
         // =============================================
 
@@ -1148,15 +1168,8 @@
                 return;
             }
             
-            // Set timeout for API request
-            const apiTimeout = setTimeout(() => {
-                showError("Server is taking too long to respond. Please try again later.");
-                console.error("API request timed out");
-            }, 10000); // 10 second timeout
-            
             // Fetch provider data
-            fetchProviderData(providerEmail)
-                .finally(() => clearTimeout(apiTimeout));
+            fetchProviderData(providerEmail);
             
             // Setup all interactive functionality
             setupEditButtons();
